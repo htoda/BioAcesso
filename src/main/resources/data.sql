@@ -1,0 +1,2 @@
+INSERT INTO `device` (`id`, `ip`, `name`, `public_key`) VALUES (1037789, '192.168.1.126', 'iDFlex', NULL);
+INSERT INTO `push` (`id`, `body`, `content_type`, `endpoint`, `query_string`, `verb`, `device_id`) VALUES (NULL, '{\n  \"type\":\"biometry\",\n  \"user_id\":1,\n  \"message\":\"Cadastro de digital\",\n  \"save\":true,\n  \"sync\":true\n}', 'application/json', 'remote_enroll', '', 'POST', 1037789);
