@@ -11,7 +11,7 @@ import javax.persistence.ManyToMany;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-@Entity (name = "groups")
+@Entity (name = "groups_device")
 public class Group {
 	
 	@Id
