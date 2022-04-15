@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.bioconnect.BioAcesso.model.Device;
 import br.com.bioconnect.BioAcesso.model.User;
+import br.com.bioconnect.BioAcesso.model.dtodevice.InsertPhotoReturnDTO;
 import br.com.bioconnect.BioAcesso.model.dtodevice.UserDeviceDto;
 import br.com.bioconnect.BioAcesso.repository.IUserRepository;
 import br.com.bioconnect.BioAcesso.service.message.FacialMessage;
@@ -194,10 +195,32 @@ public class PhotoSyncronizationService {
 			retorno = this.cadastroUsuarioService.persistFotos(device, listaUsuariosAtualizarDevice, true);
 			if (retorno == null) {
 				return "Erro no processo de excução de atualização fotos do usuário - criarFotos";
+			} else {
+				
+				sb.append("Quantidade de usuários com fotos a serem atualizadas no device: " + listaUsuariosAtualizarDevice.size() + "\n");
+				
+				json_obj = new JSONObject(retorno);
+				// recupera o array "results"
+				json_array = json_obj.getJSONArray("results");
+				objectMapper = new ObjectMapper();
+				try {
+					List <InsertPhotoReturnDTO> listReturnUpdateImageDeviceDTO = objectMapper.readValue(json_array.toString(),new TypeReference<List<InsertPhotoReturnDTO>>() {});
+					sb.append("   Quantidade de usuários que tiveram fotos atualizadas no device: " + listReturnUpdateImageDeviceDTO.stream().filter(l -> l.getSuccess() == true).count() + "\n");	
+					sb.append("   Quantidade de usuários que NÃO tiveram fotos atualizadas no device: " + listReturnUpdateImageDeviceDTO.stream().filter(l -> l.getSuccess() == false).count() + "\n");
+					
+					// TODO: resolver problema de recuperar array aninhado do deserializador do JSON
+					/*
+					 * listReturnUpdateImageDeviceDTO.stream() .filter(l -> l.getSuccess() == false)
+					 * .forEach(rf -> System.out.println(rf.getUser_id() + ": " +
+					 * rf.getErros().iterator().next().getMessage()));
+					 */
+					
+				} catch (JsonProcessingException e2) {
+					e2.printStackTrace();
+				}
 			}
 		}
 		
-		sb.append("Quantidade de usuários com fotos atualizadas no device: " + listaUsuariosAtualizarDevice.size() + "\n");
 		//sb.append("Identificadores de usuários com todos atualizadas no device: " + retorno + "\n");
 
 		return sb.toString();
