@@ -59,7 +59,7 @@ public class FacialMessage {
 	}	
 	
 	//Cadastrar lista de fotos de usuário
-	public HttpRequest setPhotoListToDevice(Device device, List<User> listUsuario, boolean matchEnabled) throws URISyntaxException {
+	public HttpRequest setPhotoListToDevice (Device device, List<User> listUsuario, boolean matchEnabled) throws URISyntaxException {
 		String URLContext = "/user_set_image_list.fcgi?session=" + device.getSessionTokenTreated();
 
 		
@@ -71,16 +71,16 @@ public class FacialMessage {
 		
 		// criar elementos do array de user image
 		for (User usuario : listUsuario) {
-			bodyUserImage = mapper.createObjectNode();
-			bodyUserImage.put("user_id", usuario.getUserId());
-			bodyUserImage.put("timestamp", usuario.getImageTimestamp());
-			bodyUserImage.put("image", Base64.getEncoder().encodeToString(usuario.getFoto()));
-			bodyArray.add(bodyUserImage);
+			if (usuario.getFoto() != null) {
+				bodyUserImage = mapper.createObjectNode();
+				bodyUserImage.put("user_id", usuario.getUserId());
+				bodyUserImage.put("timestamp", usuario.getImageTimestamp());
+				bodyUserImage.put("image", Base64.getEncoder().encodeToString(usuario.getFoto()));
+				bodyArray.add(bodyUserImage);
+			}
 		}
 		
 		// adicionando body array no nó user image
-		
-		
 		message.put("match", matchEnabled);
 		message.set("user_images", bodyArray);
 		String body;
@@ -91,7 +91,7 @@ public class FacialMessage {
 			throw new JSONException("Problema na estruturação de JSON");
 		}
 
-		return this.postRequestBuilder(device,body,URLContext);
+		return this.postRequestBuilderBatch(device,body,URLContext);
 	}	
 	
 	public HttpRequest postInitializeRemoteEnroll (Device device) throws URISyntaxException {
@@ -148,7 +148,15 @@ public class FacialMessage {
 				.POST(HttpRequest.BodyPublishers.ofString(body))
 				.build();
 	}
-
+	
+	private HttpRequest postRequestBuilderBatch (Device device, String body, String URLContext) throws URISyntaxException {
+		return HttpRequest.newBuilder().uri(new URI(ConfigEnums.defaultHttpProtocol.valor + device.getIp() + ":" + device.getPort() + URLContext))
+				.headers("Content-Type", "application/json;charset=UTF-8")
+				.timeout(Duration.ofSeconds(Integer.valueOf(ConfigEnums.defaultTimeout_ServerToFacialsBatch.valor)))
+				.POST(HttpRequest.BodyPublishers.ofString(body))
+				.build();
+	}
+	
 	private HttpRequest postRequestBuilderEnroll (Device device, String body, String URLContext) throws URISyntaxException {
 		return HttpRequest.newBuilder().uri(new URI(ConfigEnums.defaultHttpProtocol.valor + device.getIp() + ":" + device.getPort() + URLContext))
 				.headers("Content-Type", "application/json;charset=UTF-8")

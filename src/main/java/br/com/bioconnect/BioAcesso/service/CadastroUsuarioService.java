@@ -6,6 +6,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,7 +116,28 @@ public class CadastroUsuarioService {
 		return null;
 	}
 	
-	public String persistFotos(Device device, List<User> listUsuario, boolean matchEnabled) {
+	
+	public String persistFotos(Device device, List<User> listUsuario, boolean matchEnabled)  {
+		int partitionSize = 50;
+		StringBuilder sb = new StringBuilder();
+		
+		List<List<User>> partitions = new LinkedList<List<User>>();
+		for (int i = 0; i < listUsuario.size(); i += partitionSize) {
+		    partitions.add(listUsuario.subList(i, Math.min(i + partitionSize, listUsuario.size())));
+		}
+		
+		int i =0;
+		for (List<User> listUserPartition : partitions) {
+			sb.append(this.persistFotosBlock(device, listUserPartition, matchEnabled));
+			i += 1;
+			System.out.println("Fotos - enviando bloco " + i);
+			
+		}
+		
+		return sb.toString();
+	}
+	
+	private String persistFotosBlock(Device device, List<User> listUsuario, boolean matchEnabled) {
 		HttpRequest req;
 		HttpResponse<String> response;
 

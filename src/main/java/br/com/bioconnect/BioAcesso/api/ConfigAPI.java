@@ -26,6 +26,17 @@ public class ConfigAPI {
 	@Autowired
 	private ConfigService configService;
 	
+	@GetMapping("/initialize_device/{ipAdress}")
+	public ResponseEntity<?> initialConfig(HttpServletRequest request,@PathVariable String ipAdress) {
+		String retorno;
+		retorno = this.configService.initialConfig(new Device(ipAdress,serverConfig.getDevicePort())); 
+		if (retorno != null)  {
+			return ResponseEntity.ok().body(retorno);
+		} else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+	
 	@GetMapping("/setonlinemode/{ipAdress}")
 	public ResponseEntity<?> setOnlineMode(@RequestParam Map<String, String> params, HttpServletRequest request,@PathVariable String ipAdress) {
 		
@@ -58,15 +69,6 @@ public class ConfigAPI {
 		
 	}
 	
-	@GetMapping("/getobjectvalue/{ipAdress}/{objeto}")
-	public ResponseEntity<?> getLoadObject(HttpServletRequest request,@PathVariable String ipAdress,@PathVariable String objeto) {
-
-		String ret = this.configService.getLoadObject(new Device(ipAdress,serverConfig.getDevicePort()),objeto);
-					
-		return ResponseEntity.ok().body(ret);
-				
-	}
-	
 	@GetMapping("/getcreatecontrollerobject/{ipAdress}")
 	public ResponseEntity<?> getCreateControllerObject(HttpServletRequest request,@PathVariable String ipAdress) {
 
@@ -78,7 +80,6 @@ public class ConfigAPI {
 				
 	}
 	
-	
 	@GetMapping("/setonlineserver/{ipAdress}")
 	public ResponseEntity<?> setOnlineServer(@RequestParam Map<String, String> params, HttpServletRequest request,@PathVariable String ipAdress) {
 		
@@ -89,16 +90,12 @@ public class ConfigAPI {
 		}
 	}
 	
-	
-	@GetMapping("/initialize_device/{ipAdress}")
-	public ResponseEntity<?> initialConfig(HttpServletRequest request,@PathVariable String ipAdress) {
-		String retorno = null;
-		retorno = this.configService.initialConfig(new Device(ipAdress,serverConfig.getDevicePort())); 
-		if (retorno != null || retorno.isEmpty())  {
-			return ResponseEntity.ok().body(retorno);
-		} else {
-			return ResponseEntity.badRequest().build();
-		}
+	@GetMapping("/getobjectvalue/{ipAdress}/{objeto}")
+	public ResponseEntity<?> getLoadObject(HttpServletRequest request,@PathVariable String ipAdress,@PathVariable String objeto) {
+
+		String ret = this.configService.getLoadObject(new Device(ipAdress,serverConfig.getDevicePort()),objeto);
+					
+		return ResponseEntity.ok().body(ret);
 				
 	}
 	

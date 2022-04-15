@@ -214,31 +214,39 @@ public class ConfigService {
 		sb.append("\n");
 		
 		if (this.setPushConfigurarion(device)) {
-			sb.append("Push configuration: ok");
+			sb.append("Configurar servidor de Push configuration: ok");
 		} else {
-			sb.append("Push configuration: erro");
+			sb.append("Configurar servidor de Push: erro");
 		}
 		sb.append("\n");
 	
 		if (this.setMonitorConfigurarion(device)) {
-			sb.append("Monitor configuration: ok");
+			sb.append("Configurar servidor de Monitor: ok");
 		} else {
-			sb.append("Monitor configuration: erro");
+			sb.append("Configurar servidor de Monitor: erro");
 		}
 		sb.append("\n");
 		
 		if (this.getCreateControllerObject(device)) {
-			sb.append("Configuração de controller: ok");
+			sb.append("Inserir servidor de Controller: ok");
 		} else {
-			sb.append("Configuração de controller: erro");
+			sb.append("Inserir servidor de Controller: erro");
 		}
 		sb.append("\n");
 		
 		if (this.setOnlineServer(device)) {
-			sb.append("Configuração de servidor online: ok");
+			sb.append("Configurar servidor online: ok");
 		} else {
-			sb.append("Configuração de servidor online: erro");
+			sb.append("Configurar servidor online: erro");
 		}
+		sb.append("\n");
+		
+		if (this.setOnlineMode(device)) {
+			sb.append("Configurar device em modo online: ok");
+		} else {
+			sb.append("Configurar device em modo online: erro");
+		}
+		sb.append("\n");
 		
 		return sb.toString();
 	}
