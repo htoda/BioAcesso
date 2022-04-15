@@ -16,11 +16,13 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.bioconnect.BioAcesso.model.Device;
 import br.com.bioconnect.BioAcesso.model.User;
+import br.com.bioconnect.BioAcesso.model.dtodevice.UserDeviceDto;
 import br.com.bioconnect.BioAcesso.model.dtodevice.UserPhotoTimestampDTO;
 import br.com.bioconnect.BioAcesso.repository.IUserRepository;
 import br.com.bioconnect.BioAcesso.service.message.FacialMessage;
@@ -36,23 +38,55 @@ public class PhotoSyncronizationService {
 
 	@Autowired
 	private CadastroUsuarioService cadastroUsuarioService;
+	
+	@Autowired
+	private ConfigService configService;
 
 	public String doPhotoSyncronization(Device device) {
+		JSONObject json_obj;
+		JSONArray json_array;
+		ObjectMapper objectMapper;
 		StringBuilder sb = new StringBuilder();
-		String retorno;
+		String retorno = null;
 		
-		sb.append("Iniciando processo de carga ... \n");
+		sb.append("Iniciando processo de sincronização de usuários ... \n");
 
 		// Recuperar lista de usuários cadastrados no do banco de dados
 		List<User> listaUsuarioBD = this.userRepository.findAll();
-		sb.append("Quantidade de usuários no banco de dados: " + listaUsuarioBD.size() + "\n");
-		if (listaUsuarioBD.size() == 0)
+		if (listaUsuarioBD.size() == 0) {
 			return "Não foram encontrados usuários no Banco de dados";
+		} else {
+			sb.append("Quantidade de usuários no banco de dados: " + listaUsuarioBD.size() + "\n");	
+		}
+		
+		// Recuperar lista de usuários cadastrados no do banco de dados
+		//List<User> listaUsuarioBDComFoto = this.userRepository.findByFotoIsNotNull();
+		//sb.append("Quantidade de usuários com foto no banco de dados: " + listaUsuarioBDComFoto.size() + "\n");	
 
+		// Recuperar lista de usuários cadastrados no device
+		List<UserDeviceDto> listUsuarioDeviceDTO = null;
+		json_obj = new JSONObject(this.configService.getLoadObject(device, "users"));
+		// recupera o array "image_info"
+		json_array = json_obj.getJSONArray("users");
+		objectMapper = new ObjectMapper();
+		try {
+			listUsuarioDeviceDTO = objectMapper.readValue(json_array.toString(),
+					new TypeReference<List<UserDeviceDto>>() {
+					});
+			
+			sb.append("Quantidade de usuários device: " + listUsuarioDeviceDTO.size() + "\n");	
+
+		} catch (JsonProcessingException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
+		List<User> listaUsuarioDevice = listUsuarioDeviceDTO.stream()
+				.map(userDTO -> new User(userDTO.getId(), userDTO.getImage_timestamp()))
+				.collect(Collectors.toList());
+		
 		// Recuperar lista de usuários cadastrados com fotos do device
-		JSONObject json_obj = null;
-		List<UserPhotoTimestampDTO> listUsuarioDeviceDTO = null;
-
+		List<UserPhotoTimestampDTO> listUsuarioDeviceComFotoDTO = null;
 		try {
 			HttpRequest req = this.facialMessage.getListImagesFromDevices(device);
 			HttpResponse<String> response = HttpClient.newBuilder().build().send(req, BodyHandlers.ofString());
@@ -61,14 +95,14 @@ public class PhotoSyncronizationService {
 			json_obj = new JSONObject(response.body());
 
 			// recupera o array "image_info"
-			JSONArray image_info_array = json_obj.getJSONArray("image_info");
-			ObjectMapper objectMapper = new ObjectMapper();
+			json_array = json_obj.getJSONArray("image_info");
+			objectMapper = new ObjectMapper();
 
-			listUsuarioDeviceDTO = objectMapper.readValue(image_info_array.toString(),
+			listUsuarioDeviceComFotoDTO = objectMapper.readValue(json_array.toString(),
 					new TypeReference<List<UserPhotoTimestampDTO>>() {
 					});
 
-			sb.append("Quantidade de usuários no device: " + listUsuarioDeviceDTO.size() + "\n");
+			sb.append("Quantidade de usuários com foto no device: " + listUsuarioDeviceComFotoDTO.size() + "\n");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e1) {
@@ -77,7 +111,7 @@ public class PhotoSyncronizationService {
 			e1.printStackTrace();
 		}
 
-		List<User> listaUsuarioDevice = listUsuarioDeviceDTO.stream()
+		List<User> listaUsuarioDeviceComFoto = listUsuarioDeviceComFotoDTO.stream()
 				.map(userDTO -> new User(userDTO.getUser_id(), userDTO.getTimestamp()))
 				.collect(Collectors.toList());
 
@@ -115,30 +149,35 @@ public class PhotoSyncronizationService {
 			
 			retorno = this.cadastroUsuarioService.persistFotos(device, listUsuariosCadastrarNoDevice, true);
 			if (retorno != null) {
-				System.out.println(retorno);
+				//System.out.println(retorno);
 			} else {
 				return "Erro no processo de excução de criação de usuário - criarFotos";
 			}
 
 		}
 
-		sb.append("Quantidade cadastrados no device: " + listUsuariosCadastrarNoDevice.size() + "\n");
+		sb.append("Quantidade de usuários cadastrados no device: " + listUsuariosCadastrarNoDevice.size() + "\n");
 		//sb.append("ids de usuários cadastrados no device: " + listUsuariosCadastrarNoDevice.toString() + "\n");
 
-		// Identificar fotos mais atualizadas no banco de dados -> atualizar imagem no
-		// device
-		/*
-		 * List<UserPhotoTimestampDTO> listaElementosExistentesAmbos =
-		 * listUserPhotoTimestampDTOFromBD .stream() .filter(element ->
-		 * listUsuarioDeviceFlatList.contains(element)) .collect(Collectors.toList());
-		 * 
-		 * List<UserPhotoTimestampDTO> listaElementosAtualizarDevice =
-		 * listaElementosExistentesAmbos .stream() .filter(element ->
-		 * element.getPhotoTimestamp().compareTo(listUsuarioDeviceFlatList.get(
-		 * listUsuarioDeviceFlatList.indexOf(element)).getPhotoTimestamp())> 0)
-		 * .collect(Collectors.toList());
-		 */
 		
+		/*
+		// Identificar cadastros de usuários com foto existentes apenas no banco de dados -> cadastrar imagem no device
+		List<User> listUsuariosCadastrarFotoNoDevice = listaUsuarioBDComFoto.stream()
+				.filter(element -> !listaUsuarioDeviceComFoto.contains(element)).collect(Collectors.toList());
+		
+		// enviar msgs de cadastramento de imagens para o device
+		if (listUsuariosCadastrarFotoNoDevice.size() > 0) {
+			retorno = this.cadastroUsuarioService.persistFotos(device, listUsuariosCadastrarFotoNoDevice, true);
+			if (retorno != null) {
+				//System.out.println(retorno);
+			} else {
+				return "Erro no processo de excução de criação de usuário - criarFotos";
+			}
+		}
+		sb.append("Quantidade de fotos usuários cadastrados no device: " + listUsuariosCadastrarFotoNoDevice.size() + "\n");
+		*/
+		
+		// Identificar cadastros de usuários com foto existentes no BD e no device, comparar datas e atualizar no device caso a foto do BD esteja mais atualizada		
 		List<User> listaUsuariosAtualizarDevice = listaUsuarioBD.stream()
 				.filter(element -> listaUsuarioDevice.contains(element))
 				.filter(element -> element.getImageTimestamp().compareTo(
@@ -148,15 +187,13 @@ public class PhotoSyncronizationService {
 		// enviar msgs de atualizacao de imagens para o device
 		if (listaUsuariosAtualizarDevice.size() > 0) {
 			retorno = this.cadastroUsuarioService.persistFotos(device, listaUsuariosAtualizarDevice, true);
-			if (retorno != null) {
-				System.out.println(retorno);
-			} else {
+			if (retorno == null) {
 				return "Erro no processo de excução de atualização fotos do usuário - criarFotos";
 			}
 		}
 		
-		sb.append("Quantidade de usuários com todos atualizadas no device: " + listaUsuariosAtualizarDevice.size() + "\n");
-		//sb.append("ids de usuários com todos atualizadas no device: " + listaUsuariosAtualizarDevice.toString() + "\n");
+		sb.append("Quantidade de usuários com fotos atualizadas no device: " + listaUsuariosAtualizarDevice.size() + "\n");
+		//sb.append("Identificadores de usuários com todos atualizadas no device: " + retorno + "\n");
 
 		return sb.toString();
 

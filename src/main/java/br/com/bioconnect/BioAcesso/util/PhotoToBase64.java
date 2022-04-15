@@ -10,13 +10,13 @@ import org.apache.commons.io.FileUtils;
 public class PhotoToBase64 {
 
 	public static void main(String[] args) {
-		Optional<String> base64Str = convertPhotoToBase64("/home/hugo/Downloads/fotos/senna.jpeg");
+		Optional<String> base64Str = convertPhotoToBase64("/home/hugo/dev/Fotos/Aleatorias/hamilton.jpeg");
 		base64Str.ifPresent(ret -> System.out.println(ret));
 		
 		byte[] fileContentNew = Base64.getDecoder().decode(base64Str.get());
 		
 		try {
-			FileUtils.writeByteArrayToFile(new File("/home/hugo/Downloads/fotos/senna2222.jpeg"), fileContentNew);
+			FileUtils.writeByteArrayToFile(new File("/home/hugo/dev/Fotos/Aleatorias/senna-gerada.jpeg"), fileContentNew);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

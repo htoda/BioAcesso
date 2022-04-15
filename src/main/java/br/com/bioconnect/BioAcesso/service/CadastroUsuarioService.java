@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.bioconnect.BioAcesso.model.Device;
 import br.com.bioconnect.BioAcesso.model.User;
-import br.com.bioconnect.BioAcesso.model.dto.UserDeviceDto;
+import br.com.bioconnect.BioAcesso.model.dtodevice.UserDeviceDto;
 import br.com.bioconnect.BioAcesso.service.message.ConfigMessage;
 import br.com.bioconnect.BioAcesso.service.message.FacialMessage;
 import br.com.bioconnect.BioAcesso.service.message.UserMessage;

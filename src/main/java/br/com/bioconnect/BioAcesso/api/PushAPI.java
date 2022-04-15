@@ -50,14 +50,7 @@ public class PushAPI {
 	
 	@GetMapping("/push")
 	public ResponseEntity<?> push(@RequestParam Map<String, String> params, HttpServletRequest request) {
-		System.out.println("\n\nPushAPI.push (GET)");
-		
-		/*
-		ResponseEntity<?> ret = this.bodyError(request);
-		if (ret != null) {
-			return ret;
-		}
-		*/
+		//System.out.println("\n\nPushAPI.push (GET)");
 		
 		this.processInitialDevicePush(request);
 		
@@ -94,6 +87,8 @@ public class PushAPI {
 		String deviceId = request.getParameter("deviceId");
 		String addr = request.getRemoteAddr();
 		
+		System.out.println("\n\nPushAPI.push (GET) - Device: " + addr + " - " + deviceId);
+		
 		
 		// 1. Avaliar se o device já está cadastrado no banco de dados
 		Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
@@ -112,13 +107,11 @@ public class PushAPI {
 				device.setIp(addr);
 				this.deviceRepo.save(device);
 			}
-			
 		}
-		
-		//this.photoSyncronizationService.doPhotoSyncronization(device);
-		
+		System.out.println(this.photoSyncronizationService.doPhotoSyncronization(device));
 	}
 	
+	/*
 	private ResponseEntity<?> bodyError(HttpServletRequest request) {
 		String addr = request.getRemoteAddr();
 		String host = request.getRemoteHost();
@@ -142,6 +135,7 @@ public class PushAPI {
 		
 		return null;
 	}
+	*/
 	
 	@PostMapping("/push")
 	@Transactional

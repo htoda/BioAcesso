@@ -1,4 +1,4 @@
-package br.com.bioconnect.BioAcesso.model.dto;
+package br.com.bioconnect.BioAcesso.model.dtodevice;
 
 import java.math.BigInteger;
 

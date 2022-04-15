@@ -22,7 +22,7 @@ import javax.persistence.SequenceGenerator;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 
-import br.com.bioconnect.BioAcesso.model.dto.UserDeviceDto;
+import br.com.bioconnect.BioAcesso.model.dtodevice.UserDeviceDto;
 import br.com.bioconnect.BioAcesso.model.form.UserForm;
 import br.com.bioconnect.BioAcesso.model.form.UserFormCadastroRemoto;
 

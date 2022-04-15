@@ -146,7 +146,7 @@ public class Device {
 		if (!this.checkIfSessionTokenIsValid()) {
 			this.sessionToken = this.getNewSessionToken();
 		}
-		System.out.println(sessionToken);
+		//System.out.println(sessionToken);
 		return this.sessionToken;
 	}
 
