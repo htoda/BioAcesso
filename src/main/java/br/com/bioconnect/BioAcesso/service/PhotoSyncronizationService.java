@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.bioconnect.BioAcesso.model.Device;
 import br.com.bioconnect.BioAcesso.model.User;
 import br.com.bioconnect.BioAcesso.model.dtodevice.UserDeviceDto;
-import br.com.bioconnect.BioAcesso.model.dtodevice.UserPhotoTimestampDTO;
 import br.com.bioconnect.BioAcesso.repository.IUserRepository;
 import br.com.bioconnect.BioAcesso.service.message.FacialMessage;
 
@@ -77,13 +76,14 @@ public class PhotoSyncronizationService {
 			sb.append("Quantidade de usuários device: " + listUsuarioDeviceDTO.size() + "\n");	
 
 		} catch (JsonProcessingException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
 		
 		List<User> listaUsuarioDevice = listUsuarioDeviceDTO.stream()
 				.map(userDTO -> new User(userDTO.getId(), userDTO.getImage_timestamp()))
 				.collect(Collectors.toList());
+		
+		/*
 		
 		// Recuperar lista de usuários cadastrados com fotos do device
 		List<UserPhotoTimestampDTO> listUsuarioDeviceComFotoDTO = null;
@@ -114,6 +114,9 @@ public class PhotoSyncronizationService {
 		List<User> listaUsuarioDeviceComFoto = listUsuarioDeviceComFotoDTO.stream()
 				.map(userDTO -> new User(userDTO.getUser_id(), userDTO.getTimestamp()))
 				.collect(Collectors.toList());
+
+		*/
+		
 
 		// Identificar cadastros de usuários existentes apenas no banco de dados ->
 		// cadastrar usuários e imagem no device
@@ -177,10 +180,12 @@ public class PhotoSyncronizationService {
 		sb.append("Quantidade de fotos usuários cadastrados no device: " + listUsuariosCadastrarFotoNoDevice.size() + "\n");
 		*/
 		
+
 		// Identificar cadastros de usuários com foto existentes no BD e no device, comparar datas e atualizar no device caso a foto do BD esteja mais atualizada		
 		List<User> listaUsuariosAtualizarDevice = listaUsuarioBD.stream()
-				.filter(element -> listaUsuarioDevice.contains(element))
-				.filter(element -> element.getImageTimestamp().compareTo(
+				.filter(element -> element.getImageTimestamp() != null)  // filtra usuários do BD que tem foto
+				.filter(element -> listaUsuarioDevice.contains(element)) // filtra usuários do BD que estão cadastrados no device 
+				.filter(element -> element.getImageTimestamp().compareTo(// filtra usuários do BD cuja foto tenha timestamp superior (foto mais recente) a foto do device 
 						listaUsuarioDevice.get(listaUsuarioDevice.indexOf(element)).getImageTimestamp()) > 0)
 				.collect(Collectors.toList());
 
