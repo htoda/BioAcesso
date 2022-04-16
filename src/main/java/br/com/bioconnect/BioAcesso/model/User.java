@@ -2,11 +2,13 @@ package br.com.bioconnect.BioAcesso.model;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -77,20 +79,27 @@ public class User {
 	private Timestamp dataAtualizacao;
 
 	@ManyToMany
-	@JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
+	@JoinTable(
+				name = "user_groups", 
+				joinColumns = @JoinColumn(name = "user_id"), 
+				inverseJoinColumns = @JoinColumn(name = "group_id")
+	)
 	private Set<Group> listGroups;
 
-	@OneToMany(mappedBy = "usuario")
+	@OneToMany(
+			mappedBy = "usuario",
+			//orphanRemoval = true,
+			cascade = CascadeType.ALL)
 	private Set<UserRoles> listRoles;
 
 	@Column(name = "_turma")
 	private String turma;
 
-	@Column(name = "_controle2")
-	private String controle2;
+	@Column(name = "_telefone")
+	private String telefone;
 
-	@Column(name = "_controle3")
-	private String controle3;
+	@Column(name = "_email")
+	private String email;
 
 	public User() {
 	}
@@ -111,11 +120,11 @@ public class User {
 		this.name = form.getName();
 		this.password = form.getPassword();
 		this.salt = form.getSalt();
-		listGroups = new HashSet<Group>();
-		listGroups.add(new Group(form.getGroupId()));
+		this.listGroups    = new HashSet<Group>(Arrays.asList(new Group(form.getGroupId())));
+		if (form.getRoleId() != null) this.listRoles =  new HashSet<UserRoles>(Arrays.asList(new UserRoles(form.getRoleId(),this)));
 		this.turma = form.getTurma();
-		this.controle2 = form.getControle2();
-		this.controle3 = form.getControle3();
+		this.telefone = form.getTelefone();
+		this.email = form.getEmail();
 	}
 
 	public User(UserDeviceDto objDeviceDTO) {
@@ -143,12 +152,12 @@ public class User {
 		this.beginTime     = obj.getBeginTime();
 		this.endTime       = obj.getEndTime();
 		this.foto          = obj.getFoto();
-		this.imageTimestamp= obj.getImageTimestamp();
+		this.imageTimestamp= obj.getFoto() != null ? Instant.now().getEpochSecond() : null;
 		this.listGroups    = new HashSet<Group>(Arrays.asList(new Group(obj.getGroupId())));
-		this.listRoles     = new HashSet<UserRoles>(Arrays.asList(new UserRoles(obj.getRoleId())));
+		if (obj.getRoleId() != null) this.listRoles =  new HashSet<UserRoles>(Arrays.asList(new UserRoles(obj.getRoleId(),this)));
 		this.turma         = obj.getTurma();
-		this.controle2     = obj.getControle2();
-		this.controle3     = obj.getControle3();
+		this.telefone     = obj.getTelefone();
+		this.email     = obj.getEmail();
 	}
 	
 	/*
@@ -295,20 +304,20 @@ public class User {
 		this.turma = turma;
 	}
 
-	public String getControle2() {
-		return controle2;
+	public String getTelefone() {
+		return telefone;
 	}
 
-	public void setControle2(String controle2) {
-		this.controle2 = controle2;
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
-	public String getControle3() {
-		return controle3;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setControle3(String controle3) {
-		this.controle3 = controle3;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	@Override
@@ -328,7 +337,7 @@ public class User {
 		return Objects.equals(userId, other.userId);
 	}
 
-	public User copyNewValues(UserForm obj) {
+	public User copyNewValuesUpdateEvent(UserForm obj) {
 		this.registration  = obj.getRegistration();
 		this.name          = obj.getName();
 		this.password      = obj.getPassword();
@@ -337,13 +346,13 @@ public class User {
 		this.userTypeId    = obj.getUserTypeId();
 		this.beginTime     = obj.getBeginTime();
 		this.endTime       = obj.getEndTime();
+		this.imageTimestamp= Arrays.equals(this.foto,obj.getFoto()) ? null : Instant.now().getEpochSecond();
 		this.foto          = obj.getFoto();
-		this.imageTimestamp= obj.getImageTimestamp();
 		this.listGroups    = new HashSet<Group>(Arrays.asList(new Group(obj.getGroupId())));
-		this.listRoles     = new HashSet<UserRoles>(Arrays.asList(new UserRoles(obj.getRoleId())));
+		this.listRoles     = new HashSet<UserRoles>(Arrays.asList(new UserRoles(obj.getRoleId(),this)));
 		this.turma         = obj.getTurma();
-		this.controle2     = obj.getControle2();
-		this.controle3     = obj.getControle3();
+		this.telefone     = obj.getTelefone();
+		this.email     = obj.getEmail();
 		return this;
 	}
 

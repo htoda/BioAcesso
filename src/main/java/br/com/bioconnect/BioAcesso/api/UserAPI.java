@@ -71,7 +71,7 @@ public class UserAPI {
 		Optional<User> userOpt = this.userRepository.findById(form.getUserId());
 		if (!userOpt.isPresent()) return ResponseEntity.notFound().build();
 		User user = userOpt.get();
-		userRepository.save(user.copyNewValues(form));
+		userRepository.save(user.copyNewValuesUpdateEvent(form));
 
         return ResponseEntity.ok(new UserDto(user));
 		

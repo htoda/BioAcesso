@@ -44,9 +44,9 @@ public class UserDto {
 	
 	private String turma;
 
-	private String controle2;
+	private String telefone;
     
-	private String controle3;
+	private String email;
 
 	
 	public UserDto(User obj) {
@@ -66,8 +66,8 @@ public class UserDto {
 		this.listGroups = obj.getListGroups().stream().map(l -> new GroupDTO(l)).collect(Collectors.toSet());
 		this.listRoles = obj.getListRoles().stream().map(l -> new UserRolesDTO(l)).collect(Collectors.toSet());
 		this.turma = obj.getTurma();
-		this.controle2 = obj.getControle2();
-		this.controle3 = obj.getControle3();
+		this.telefone = obj.getTelefone();
+		this.email = obj.getEmail();
 	}
 	
 	public static Page<UserDto> converter(Page<User> lista) {
@@ -207,19 +207,19 @@ public class UserDto {
 	}
 
 	public String getControle2() {
-		return controle2;
+		return telefone;
 	}
 
 	public void setControle2(String controle2) {
-		this.controle2 = controle2;
+		this.telefone = controle2;
 	}
 
 	public String getControle3() {
-		return controle3;
+		return email;
 	}
 
 	public void setControle3(String controle3) {
-		this.controle3 = controle3;
+		this.email = controle3;
 	}
 	
 }

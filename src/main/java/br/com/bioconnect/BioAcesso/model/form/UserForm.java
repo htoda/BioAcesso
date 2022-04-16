@@ -2,19 +2,25 @@ package br.com.bioconnect.BioAcesso.model.form;
 
 import java.math.BigInteger;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import br.com.bioconnect.BioAcesso.annotations.TelefoneValidator;
 import br.com.bioconnect.BioAcesso.model.User;
 
 public class UserForm {
 
 	private BigInteger userId;
 	
-	@NotNull @NotEmpty
+	@NotNull(message = "Matrícula/Identificação do usuário não pode ser nula")
+	@NotEmpty(message = "Matrícula/Identificação do usuário deve ter conteúdo informado")
 	private String registration;
 	
-	@NotNull @NotEmpty
+	@NotNull(message = "Nome não pode ser nulo")
+	@NotEmpty(message = "Nome deve ter conteúdo informado")
 	private String name;
 
 	private String password;
@@ -23,7 +29,7 @@ public class UserForm {
 	
 	private Long expires;
 	
-	@NotNull
+	@NotNull(message = "Tipo do usuário não pode ser nulo (0-usuário padrão; 1- usuário visitante")
 	private Integer userTypeId;
 	
 	private Long beginTime;
@@ -32,19 +38,27 @@ public class UserForm {
 	
     private byte[] foto;
 	
-	private Long imageTimestamp;
+	//private Long imageTimestamp;
 	
-	@NotNull
+    @NotNull(message = "Grupo do usuário deve ser informado (1:usuário padrão")
+    @Min(value = 1, message = "Perfil do usuário deve ser selecionado entre 1 e 1 (usuário padrão)")
+    @Max(value = 1, message = "Perfil do usuário deve ser selecionado entre 1 e 1 (usuário padrão)")
     private Integer groupId;
     
+    @NotNull(message = "Perfil do usuário deve ser informado (0:usuário padrão; 1:usuário administrador")
+    @Min(value = 0, message = "Perfil do usuário deve ser selecionado entre 0 (usuário padrão) e 1 (usuário administrador)")
+    @Max(value = 1, message = "Perfil do usuário deve ser selecionado entre 0 (usuário padrão) e 1 (usuário administrador)")
 	private Integer roleId;
 	
 	private String turma;
-
-	private String controle2;
+	
+	@TelefoneValidator
+	private String telefone;
     
-	private String controle3;
-
+	@Email(message = "Email deve ser válido")
+	private String email;
+	
+	
 	public User converter(UserForm obj) {
 		return new User(obj);
 	}
@@ -129,13 +143,12 @@ public class UserForm {
 		this.foto = foto;
 	}
 
-	public Long getImageTimestamp() {
-		return imageTimestamp;
-	}
-
-	public void setImageTimestamp(Long imageTimestamp) {
-		this.imageTimestamp = imageTimestamp;
-	}
+	/*
+	 * public Long getImageTimestamp() { return imageTimestamp; }
+	 * 
+	 * public void setImageTimestamp(Long imageTimestamp) { this.imageTimestamp =
+	 * imageTimestamp; }
+	 */
 
 	public Integer getGroupId() {
 		return groupId;
@@ -161,20 +174,20 @@ public class UserForm {
 		this.turma = turma;
 	}
 
-	public String getControle2() {
-		return controle2;
+	public String getTelefone() {
+		return telefone;
 	}
 
-	public void setControle2(String controle2) {
-		this.controle2 = controle2;
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
-	public String getControle3() {
-		return controle3;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setControle3(String controle3) {
-		this.controle3 = controle3;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 }

@@ -49,11 +49,9 @@ public class UserMessage {
 			bodyUserImage.put("password", usuario.getPassword());
 			bodyUserImage.put("salt", usuario.getSalt());
 			bodyUserImage.put("expires", usuario.getExpires());
-			bodyUserImage.put("user_type_id", usuario.getUserId());
+			bodyUserImage.put("user_type_id", usuario.getUserTypeId());
 			bodyUserImage.put("begin_time", usuario.getBeginTime());
 			bodyUserImage.put("end_time", usuario.getEndTime());
-			bodyUserImage.put("image_timestamp", usuario.getImageTimestamp());
-			
 			bodyArray.add(bodyUserImage);
 		}
 		

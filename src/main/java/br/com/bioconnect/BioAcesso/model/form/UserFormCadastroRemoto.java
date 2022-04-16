@@ -35,8 +35,8 @@ public class UserFormCadastroRemoto {
 	
     //atributos de controle
 	private String turma;
-    private String controle2;
-    private String controle3;
+    private String telefone;
+    private String email;
 
     public BigInteger getUserId() {
 		return userId;
@@ -130,20 +130,20 @@ public class UserFormCadastroRemoto {
 		this.turma = turma;
 	}
 
-	public String getControle2() {
-		return controle2;
+	public String getTelefone() {
+		return telefone;
 	}
 
-	public void setControle2(String controle2) {
-		this.controle2 = controle2;
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
-	public String getControle3() {
-		return controle3;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setControle3(String controle3) {
-		this.controle3 = controle3;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 }

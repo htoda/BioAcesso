@@ -214,7 +214,7 @@ public class ConfigService {
 		sb.append("\n");
 		
 		if (this.setPushConfigurarion(device)) {
-			sb.append("Configurar servidor de Push configuration: ok");
+			sb.append("Configurar servidor de Push: ok");
 		} else {
 			sb.append("Configurar servidor de Push: erro");
 		}

@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 public class PhotoToBase64 {
 
 	public static void main(String[] args) {
-		Optional<String> base64Str = convertPhotoToBase64("/home/hugo/dev/Fotos/Aleatorias/hamilton.jpeg");
+		Optional<String> base64Str = convertPhotoToBase64("/home/hugo/dev/Fotos/Aleatorias/edmundo.jpeg");
 		base64Str.ifPresent(ret -> System.out.println(ret));
 		
 		byte[] fileContentNew = Base64.getDecoder().decode(base64Str.get());

@@ -19,7 +19,7 @@ public class ConfigMessage {
 	private ServerConfig serverConfig;
 	 
 	public HttpRequest getSetPushConfiguration(Device device) throws URISyntaxException {
-		String pushRequestPeriod = "120";
+		String pushRequestPeriod = "20";
 		String URLContext = "/set_configuration.fcgi?session=" + device.getSessionTokenTreated();
 		String body = "{\n" 
 					+ "	\"push_server\": {\n" 
